@@ -1,0 +1,8 @@
+node_modules/
+.next/
+.env*
+!.env.example
+# Member data and contact details are never committed
+*seed*.sql
+data/
+tsconfig.tsbuildinfo

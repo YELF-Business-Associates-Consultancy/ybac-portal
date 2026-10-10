@@ -19,7 +19,7 @@ export default async function Page({ searchParams }: { searchParams: SP }) {
   const vname = (id: string | null) => (id ? ventures?.find((v) => v.id === id)?.name ?? id : "Association");
   const statusChip = (s: string) => s === "Active" ? "ok" : s === "Funding" ? "info" : "neutral";
   return (<>
-    <div className="pagehead"><div><h1>Ventures</h1><p>Each venture’s own book. Result = money back − money in. Payables count as money in once committed; receivables count as money back once agreed.</p></div></div>
+    <div className="pagehead"><div><h1>Ventures</h1><p>Each venture’s own book. Result = money back − money in. Payables count as money in once committed; receivables count as money back once agreed.</p></div><a className="btn" href="/export/ventures">Download Excel</a></div>
     <Flash e={sp.e} ok={sp.ok} />
 
     {(ventures ?? []).map((v) => {

@@ -17,7 +17,7 @@ export default async function Page({ searchParams }: { searchParams: SP }) {
   const open = (reqs ?? []).filter((r) => r.status === "Pending" || r.status === "Approved");
   const done = (reqs ?? []).filter((r) => !(r.status === "Pending" || r.status === "Approved"));
   return (<>
-    <div className="pagehead"><div><h1>Withdrawals</h1><p>Approve or reject requests, then mark them paid once the money has gone out. Paying issues a payment voucher and reduces the member’s balance.</p></div></div>
+    <div className="pagehead"><div><h1>Withdrawals</h1><p>Approve or reject requests, then mark them paid once the money has gone out. Paying issues a payment voucher and reduces the member’s balance.</p></div><a className="btn" href="/export/withdrawals">Download Excel</a></div>
     <Flash e={sp.e} ok={sp.ok} />
     <section className="panel"><header><h2>Waiting for action</h2><span className="chip warn">{open.length}</span></header>
       {open.length === 0 ? <div className="empty">Nothing waiting.</div> :

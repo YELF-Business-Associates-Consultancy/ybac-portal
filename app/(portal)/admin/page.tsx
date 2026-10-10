@@ -17,7 +17,7 @@ export default async function AdminHome() {
   const ok = rec && Math.abs(Number(rec.books_cash) - Number(rec.bank_plus_petty)) < 0.005;
   const owed = (members ?? []).map((m) => ({ ...m, d: arrearsOf(txs[m.id]) })).filter((m) => m.d.arrears > 0).sort((a, b) => b.d.arrears - a.d.arrears);
   return (<>
-    <div className="pagehead"><div><h1>Overview</h1><p>Who owns what in the group's accounts, at {dstr(today())}.</p></div><span className="chip neutral">{members?.length ?? 0} members</span></div>
+    <div className="pagehead"><div><h1>Overview</h1><p>Who owns what in the group's accounts, at {dstr(today())}.</p></div><div className="toolbar"><span className="chip neutral">{members?.length ?? 0} members</span><a className="btn" href="/export/summary">Download summary</a></div></div>
     <div className="grid">
       <div className="tile"><span className="lbl">Bank</span><span className="n">{ghs(bal("bank"))}</span><span className="s">Compare with the latest bank statement</span></div>
       <div className="tile"><span className="lbl">Petty cash</span><span className="n">{ghs(bal("petty"))}</span><span className="s">Cash held by officers</span></div>

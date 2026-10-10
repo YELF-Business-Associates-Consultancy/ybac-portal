@@ -177,3 +177,11 @@ details.add>summary{cursor:pointer;font-weight:600;padding:12px 16px;list-style:
 details.add>summary::-webkit-details-marker{display:none}
 details.add>summary::before{content:"+ ";color:var(--accent)}
 details.add[open]>summary::before{content:"− "}
+.logo img{display:block;height:auto;max-width:100%}
+.brand .logo{margin-bottom:4px}
+@media (max-width:860px){ .brand .logo img{width:120px} .brand span{display:none} }
+@media print{
+  .rail,.noprint,nav,.pagehead .btn,form.filters,details.add{display:none!important}
+  .shell{display:block} main{padding:0} body{background:#fff;color:#000}
+  .panel{border:0} .wrap{max-width:none;padding:0}
+}

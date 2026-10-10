@@ -13,7 +13,8 @@ Run in this order, each as one query:
 2. `YBAC_002_seed_data.sql` (kept outside this repository; it contains member contact details)
    loads the reconciled records from Aug 2023 to 6 Oct 2026.
 3. `supabase/migrations/004_app_functions.sql` adds the sign-up gate, receipt numbers and the payment, withdrawal and bank-interest functions.
-4. Sign in to the app once, then run `supabase/migrations/003_first_admin.sql` to make yourself admin.
+4. `supabase/migrations/005_imports.sql` adds Excel imports (all-or-nothing) and undoing an import.
+5. Sign in to the app once, then run `supabase/migrations/003_first_admin.sql` to make yourself admin.
 
 Supabase → Authentication → URL Configuration: set the Site URL to the Vercel address and add `<site>/auth/callback` as a redirect URL.
 

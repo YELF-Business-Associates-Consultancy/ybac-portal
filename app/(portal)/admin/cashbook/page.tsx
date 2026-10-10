@@ -22,7 +22,7 @@ export default async function Page({ searchParams }: { searchParams: SP }) {
   const tout = live.filter((r) => r.direction === "out").reduce((s, r) => s + Number(r.amount), 0);
   const vname = (id: string | null) => ventures?.find((v) => v.id === id)?.name ?? id ?? "";
   return (<>
-    <div className="pagehead"><div><h1>Cashbook</h1><p>Every movement in the bank and petty cash, with what it is charged to. Member payments and withdrawals arrive here automatically.</p></div></div>
+    <div className="pagehead"><div><h1>Cashbook</h1><p>Every movement in the bank and petty cash, with what it is charged to. Member payments and withdrawals arrive here automatically.</p></div><div className="toolbar"><a className="btn" href="/admin/import?kind=cash">Import from Excel</a><a className="btn" href={`/export/cashbook?${new URLSearchParams({ from, to, ...(sp.acct ? { acct: sp.acct } : {}), ...(sp.ch ? { ch: sp.ch } : {}), ...(sp.q ? { q: sp.q } : {}) })}`}>Download Excel</a></div></div>
     <div className="grid">
       {(accts ?? []).map((a) => <div className="panel" key={a.account}><div className="body"><span className="muted">{a.account === "bank" ? "Bank" : "Petty cash"}</span><b style={{ fontSize: 22 }}>{ghs(a.balance)}</b></div></div>)}
     </div>

@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Logo from "@/components/Logo";
 import { browserDb } from "@/lib/supabase/client";
 
 // Turn on once custom SMTP is set up and the email template includes {{ .Token }}.
@@ -40,8 +41,8 @@ export default function Login() {
   return (
     <main className="login">
       <div className="card">
-        <div className="brand"><b style={{ fontFamily: "var(--display)", fontSize: 34, fontWeight: 400 }}>YBAC</b>
-          <span className="muted" style={{ fontSize: 12 }}>YELF Business Associates and Consultancy</span></div>
+        <div className="brand"><Logo width={220} />
+          <span className="muted" style={{ fontSize: 12 }}>Members’ funds portal</span></div>
         {!sent ? (
           <form onSubmit={send} className="field" style={{ gap: 12 }}>
             <label htmlFor="email">Your email</label>

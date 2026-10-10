@@ -13,7 +13,7 @@ export default async function Page({ params, searchParams }: { params: Promise<{
   if (sp.view === "statement") {
     const tx = await memberTx(sb, id);
     return (<><div className="pagehead"><div><h1>{m.full_name}</h1><p>Statement · <span className="mono">{id}</span> · {m.email} · {m.phone}</p></div></div>
-      <Statement tx={tx} from={sp.from || "2023-08-01"} to={sp.to || today()} action={`/admin/members/${id}`} /></>);
+      <Statement tx={tx} from={sp.from || "2023-08-01"} to={sp.to || today()} action={`/admin/members/${id}`} extra={{ view: "statement" }} exportHref={`/export/statement?m=${encodeURIComponent(id)}`} /></>);
   }
   return <MemberDashboard memberId={id} name={m.full_name} base={`/admin/members/${id}`} sp={sp} />;
 }

@@ -1,4 +1,5 @@
 import Nav from "@/components/Nav";
+import Logo from "@/components/Logo";
 import { context } from "@/lib/session";
 
 export default async function PortalLayout({ children }: { children: React.ReactNode }) {
@@ -8,13 +9,13 @@ export default async function PortalLayout({ children }: { children: React.React
     : [];
   const staff: [string, string][] = c.role === "member" ? [] : [
     ["/admin", "Overview"], ["/admin/performance", "Group performance"], ["/admin/members", "Members"], ["/admin/payments", "Record payment"],
-    ["/admin/cashbook", "Cashbook"], ["/admin/ventures", "Ventures"], ["/admin/withdrawals", "Withdrawal requests"],
+    ["/admin/cashbook", "Cashbook"], ["/admin/ventures", "Ventures"], ["/admin/withdrawals", "Withdrawal requests"], ["/admin/reports", "Reports and exports"], ["/admin/import", "Import"],
     ...(c.role === "admin" ? ([["/admin/rates", "Rates and resolutions"]] as [string, string][]) : []),
   ];
   return (
     <div className="shell">
       <aside className="rail">
-        <div className="brand"><b>YBAC</b><span>YELF Business Associates and Consultancy</span></div>
+        <div className="brand"><Logo width={168} /><span>Members’ funds portal</span></div>
         <Nav member={member} staff={staff} />
         <div className="railfoot">
           <span>{c.member?.full_name ?? c.email}</span>

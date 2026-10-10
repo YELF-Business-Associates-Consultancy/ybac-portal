@@ -15,7 +15,7 @@ export default async function Page({ searchParams }: { searchParams: SP }) {
     sb.from("resolutions").select("value").eq("rule", "signon").order("effective_from", { ascending: false }).limit(1).maybeSingle(),
   ]);
   return (<>
-    <div className="pagehead"><div><h1>Record a payment</h1><p>Each payment goes into the cashbook and the member’s ledger together, and gets a receipt number.</p></div></div>
+    <div className="pagehead"><div><h1>Record a payment</h1><p>Each payment goes into the cashbook and the member’s ledger together, and gets a receipt number.</p></div><div className="toolbar"><a className="btn" href="/admin/import">Import many from Excel</a><a className="btn" href={`/export/payments?from=${new Date().getFullYear()}-01-01`}>Download Excel</a></div></div>
     <section className="panel"><div className="body">
       <form action={recordPayment} className="form">
         <div className="field"><label htmlFor="member">Member</label>

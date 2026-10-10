@@ -17,7 +17,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ p
   const G = g.data as Perf;
   const list = (members ?? []).map((m, i) => ({ ...m, p: (rows[i] as { data: Perf }).data })).sort((a, b) => Number(b.p?.return_pct ?? 0) - Number(a.p?.return_pct ?? 0));
   return (<>
-    <div className="pagehead"><div><h1>Group performance</h1><p>Members see only their own figures and the group total.</p></div></div>
+    <div className="pagehead"><div><h1>Group performance</h1><p>Members see only their own figures and the group total.</p></div><a className="btn" href={`/export/performance?pf=${pk}`}>Download Excel</a></div>
     <section className="panel"><header><h2>{dstr(from)} – {dstr(to)}</h2><div className="seg">{PERIODS.map(([k, l]) => <Link key={k} href={`?pf=${k}`} aria-current={pk === k ? "true" : undefined}>{l}</Link>)}</div></header>
       <div className="body"><div className="grid">
         <div className="tile"><span className="lbl">Members contributed</span><span className="n">{ghs(G?.contributed)}</span></div>

@@ -1,8 +1,10 @@
 import Link from "next/link";
 import type { Tx } from "@/lib/data";
 import { fmt, ghs, dstr, TYPE, chipFor } from "@/lib/format";
+import PrintButton from "@/components/PrintButton";
 
-export default function Statement({ tx, from, to, action }: { tx: Tx[]; from: string; to: string; action: string }) {
+export default function Statement({ tx, from, to, action, extra = {}, exportHref }: { tx: Tx[]; from: string; to: string; action: string; extra?: Record<string, string>; exportHref: string }) {
+  const qs = (o: Record<string, string>) => "?" + new URLSearchParams({ ...extra, ...o }).toString();
   const opening = tx.filter((t) => t.tx_date < from && t.type !== "signon").reduce((s, t) => s + t.amount, 0);
   const rows = tx.filter((t) => t.tx_date >= from && t.tx_date <= to);
   const net = rows.filter((t) => t.type !== "signon").reduce((s, t) => s + t.amount, 0);
@@ -11,11 +13,15 @@ export default function Statement({ tx, from, to, action }: { tx: Tx[]; from: st
   return (
     <>
       <form className="toolbar" action={action}>
+        {Object.entries(extra).map(([k, v]) => <input key={k} type="hidden" name={k} value={v} />)}
         <div className="field"><label htmlFor="from">From</label><input type="date" id="from" name="from" defaultValue={from} /></div>
         <div className="field"><label htmlFor="to">To</label><input type="date" id="to" name="to" defaultValue={to} /></div>
         <button className="btn">Show</button>
-        {[yr, yr - 1, yr - 2].map((y) => <Link key={y} className="btn" href={`${action}?from=${y}-01-01&to=${y}-12-31`}>{y}</Link>)}
-        <Link className="btn" href={action}>All</Link>
+        {[yr, yr - 1, yr - 2].map((y) => <Link key={y} className="btn" href={`${action}${qs({ from: `${y}-01-01`, to: `${y}-12-31` })}`}>{y}</Link>)}
+        <Link className="btn" href={`${action}${Object.keys(extra).length ? qs({}) : ""}`}>All</Link>
+        <span style={{ flex: 1 }} />
+        <a className="btn" href={`${exportHref}${exportHref.includes("?") ? "&" : "?"}from=${from}&to=${to}`}>Download Excel</a>
+        <PrintButton />
       </form>
       <div className="grid">
         <div className="tile"><span className="lbl">Opening balance</span><span className="n">{ghs(opening)}</span><span className="s">{dstr(from)}</span></div>

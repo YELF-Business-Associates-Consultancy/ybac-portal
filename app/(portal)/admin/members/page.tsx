@@ -12,7 +12,7 @@ export default async function Page() {
     sb.from("venture_shares").select("member_id,share").eq("venture_id", "ppe1"), allTx(sb)]);
   const tot = (bals ?? []).reduce((s, b) => s + Number(b.balance), 0);
   return (<>
-    <div className="pagehead"><div><h1>Members</h1><p>Open a member to see their dashboard and statement.</p></div></div>
+    <div className="pagehead"><div><h1>Members</h1><p>Open a member to see their dashboard and statement.</p></div><a className="btn" href="/export/members">Download Excel</a></div>
     <section className="panel"><div className="tbl"><table><thead><tr><th>ID</th><th>Name</th><th className="r">Balance (GHS)</th><th className="r">Share of funds</th><th className="r">PPE Business 1</th><th>Dues</th><th>Signed in</th></tr></thead><tbody>
       {(members ?? []).map((m) => { const b = Number(bals?.find((x) => x.member_id === m.id)?.balance ?? 0); const d = arrearsOf(txs[m.id]);
         return <tr key={m.id}><td className="mono">{m.id}</td><td><Link href={`/admin/members/${m.id}`}>{m.full_name}</Link></td><td className="r">{fmt(b)}</td><td className="r">{pct((b / tot) * 100)}</td>

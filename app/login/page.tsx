@@ -42,6 +42,7 @@ export default function Login() {
     <main className="login">
       <div className="card">
         <div className="brand"><Logo width={220} />
+          <strong className="org">YELF Business Associates and Consultancy</strong>
           <span className="muted" style={{ fontSize: 12 }}>Members’ funds portal</span></div>
         {!sent ? (
           <form onSubmit={send} className="field" style={{ gap: 12 }}>

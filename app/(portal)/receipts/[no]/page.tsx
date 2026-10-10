@@ -15,7 +15,7 @@ export default async function Receipt({ params }: { params: Promise<{ no: string
   return (<>
     <div className="noprint" style={{ display: "flex", gap: 8 }}><PrintButton /></div>
     <section className="panel printable" style={{ maxWidth: 560 }}><div className="receipt">
-      <div className="top"><div><Logo width={150} /><div className="note">YELF Business Associates and Consultancy</div></div>
+      <div className="top"><div><Logo width={150} /><div style={{ fontWeight: 600, fontSize: 13, marginTop: 4 }}>YELF Business Associates and Consultancy</div></div>
         <div style={{ textAlign: "right" }}><div className="lbl">{isV ? "Payment voucher" : "Receipt"}</div><div className="mono">{t.receipt_no}</div></div></div>
       <div><div className="lbl">{isV ? "Paid to" : "Received from"}</div><div style={{ fontWeight: 600, fontSize: 16 }}>{name} <span className="mono muted">{t.member_id}</span></div></div>
       <div><div className="amt">GHS {fmt(amt)}</div><div className="words">{words(amt)}</div></div>

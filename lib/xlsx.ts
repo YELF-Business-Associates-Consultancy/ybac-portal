@@ -27,9 +27,10 @@ export async function workbook(sheets: Sheet[]) {
     if (logoId !== null) ws.addImage(logoId, { tl: { col: 0, row: 0 }, ext: { width: 145, height: 60 } });
     ws.getRow(1).height = 24; ws.getRow(2).height = 24;
     const titleCol = Math.min(3, s.cols.length);
-    ws.getCell(1, titleCol).value = s.title; ws.getCell(1, titleCol).font = { bold: true, size: 14 };
-    ws.getCell(2, titleCol).value = (s.subtitle ? s.subtitle + " · " : "") + "Generated " + new Date().toLocaleString("en-GB", { timeZone: "Africa/Accra" });
-    ws.getCell(2, titleCol).font = { color: { argb: "FF666666" }, size: 10 };
+    ws.getCell(1, titleCol).value = "YELF Business Associates and Consultancy"; ws.getCell(1, titleCol).font = { bold: true, size: 11 };
+    ws.getCell(2, titleCol).value = s.title; ws.getCell(2, titleCol).font = { bold: true, size: 14 };
+    ws.getCell(3, titleCol).value = (s.subtitle ? s.subtitle + " · " : "") + "Generated " + new Date().toLocaleString("en-GB", { timeZone: "Africa/Accra" });
+    ws.getCell(3, titleCol).font = { color: { argb: "FF666666" }, size: 10 };
     const head = ws.getRow(5);
     s.cols.forEach((c, i) => { const cell = head.getCell(i + 1); cell.value = c.header; cell.font = { bold: true, color: { argb: "FFFFFFFF" } };
       cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FF1A1A1A" } }; cell.alignment = { vertical: "middle", horizontal: c.kind === "money" || c.kind === "pct" ? "right" : "left" }; });

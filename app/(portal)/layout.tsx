@@ -15,7 +15,7 @@ export default async function PortalLayout({ children }: { children: React.React
   return (
     <div className="shell">
       <aside className="rail">
-        <div className="brand"><Logo width={168} /><span>Members’ funds portal</span></div>
+        <div className="brand"><Logo width={168} /><strong className="org">YELF Business Associates and Consultancy</strong><span>Members’ funds portal</span></div>
         <Nav member={member} staff={staff} />
         <div className="railfoot">
           <span>{c.member?.full_name ?? c.email}</span>

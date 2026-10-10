@@ -4,7 +4,7 @@ export default function Logo({ width = 168 }: { width?: number }) {
   return (
     <picture className="logo">
       <source srcSet="/logo-dark.png" media="screen and (prefers-color-scheme: dark)" />
-      <img src="/logo-light.png" width={width} height={h} alt="YELF Business and Associates" />
+      <img src="/logo-light.png" width={width} height={h} alt="YELF Business Associates and Consultancy" />
     </picture>
   );
 }

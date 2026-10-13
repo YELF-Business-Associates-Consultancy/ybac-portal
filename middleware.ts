@@ -28,4 +28,5 @@ export async function middleware(req: NextRequest) {
   return res;
 }
 
-export const config = { matcher: ["/((?!_next/static|_next/image|favicon.ico|icon.svg).*)"] };
+// Skip Next.js internals and any public file with an extension (logos, icons), so they load before sign-in.
+export const config = { matcher: ["/((?!_next/static|_next/image|.*\\.(?:png|jpg|jpeg|svg|ico|webp|txt)$).*)"] };

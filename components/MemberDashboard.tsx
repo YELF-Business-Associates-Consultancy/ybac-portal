@@ -8,13 +8,14 @@ export default async function MemberDashboard({ memberId, name, base, sp }: { me
   const sb = await db();
   const [from, to, pk] = period(sp.pf);
   const scope = sp.s === "group" ? "group" : "me";
-  const [tx, me, grp, series, ventures, shares] = await Promise.all([
+  const [tx, me, grp, series, ventures, shares, gseries] = await Promise.all([
     memberTx(sb, memberId),
     sb.rpc("performance", { p_from: from, p_to: to, p_member: memberId }).single(),
     sb.rpc("performance", { p_from: from, p_to: to, p_member: null }).single(),
     sb.rpc("monthly_series", { p_member: scope === "me" ? memberId : null }),
     sb.from("ventures").select("id,name,status,shares_fixed_on,closed_on").order("created_at", { ascending: false }),
     sb.from("venture_shares").select("venture_id,share").eq("member_id", memberId),
+    sb.rpc("monthly_series", { p_member: null }),   // whole-group totals (no individual figures)
   ]);
   type Perf = { contributed: number; earned: number; avg_balance: number; return_pct: number | null; annual_pct: number | null };
   const m = me.data as Perf, g = grp.data as Perf;
@@ -23,6 +24,10 @@ export default async function MemberDashboard({ memberId, name, base, sp }: { me
   const shareOf = (vid: string) => Number(shares.data?.find((s) => s.venture_id === vid)?.share ?? 0);
   const credited = (vid: string) => tx.filter((t) => t.venture_id === vid).reduce((s, t) => s + t.amount, 0);
   const posPct = (v: number) => Math.max(0, v) / Math.max(bal, 1) * 100;
+  const gs = (gseries.data ?? []) as { balance: number }[];
+  const groupBal = Number(gs[gs.length - 1]?.balance ?? 0);
+  const fundShare = groupBal > 0 ? (bal / groupBal) * 100 : null;
+  const funding = ((ventures.data ?? []) as { name: string; status: string }[]).filter((v) => v.status === "Funding").map((v) => v.name);
   const better = Number(m?.return_pct ?? 0) >= Number(g?.return_pct ?? 0);
   const q = (o: Record<string, string>) => "?" + new URLSearchParams({ ...(sp.pf ? { pf: sp.pf } : {}), ...(sp.s ? { s: sp.s } : {}), ...o }).toString();
   return (
@@ -39,6 +44,8 @@ export default async function MemberDashboard({ memberId, name, base, sp }: { me
           <div className="legend" style={{ marginTop: 8 }}><span style={{ ["--c" as string]: "var(--accent)" }}>Contributions {fmt(inv)}</span><span style={{ ["--c" as string]: "var(--gold)" }}>Venture profit {fmt(prof)}</span><span style={{ ["--c" as string]: "var(--info)" }}>Bank interest {fmt(bi)}</span></div>
         </div>
         <div className="split">
+          <div className="kv"><span>Your share of members’ funds today</span><span className="v">{pct(fundShare, 3)}</span></div>
+          <div className="kv" style={{ marginTop: -6 }}><span className="muted" style={{ fontSize: 12 }}>Of GHS {fmt(groupBal)} held for all members{funding.length ? ` · the share you’d get in ${funding.join(", ")} if its shares were fixed today` : ""}</span><span /></div>
           <div className="kv"><span>Invested contributions</span><span className="v">{ghs(inv)}</span></div>
           <div className="kv"><span>Profit and interest earned</span><span className={`v ${earn < 0 ? "neg" : "pos"}`}>{earn < 0 ? "" : "+"}{fmt(earn)}</span></div>
           <div className="kv"><span>Dues and BRA owed</span><span className={`v ${ds.arrears > 0 ? "neg" : ""}`}>{ghs(ds.arrears)}</span></div>

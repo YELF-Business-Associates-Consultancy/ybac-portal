@@ -5,7 +5,7 @@ import Logo from "@/components/Logo";
 import { browserDb } from "@/lib/supabase/client";
 
 // Turn on once custom SMTP is set up and the email template includes {{ .Token }}.
-const SHOW_CODE = false;
+const SHOW_CODE = true;
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -49,14 +49,14 @@ export default function Login() {
             <label htmlFor="email">Your email</label>
             <input id="email" type="email" required autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="The email YBAC has on file" />
             <button className="btn primary" disabled={busy}>{busy ? "Sending…" : "Email me a sign-in link"}</button>
-            <p className="note" style={{ margin: 0 }}>No password needed. We email you a sign-in link each time you sign in.</p>
+            <p className="note" style={{ margin: 0 }}>No password needed. We email you a sign-in code each time you sign in.</p>
           </form>
         ) : (
           <form onSubmit={verify} className="field" style={{ gap: 12 }}>
-            <p style={{ margin: 0 }}>We sent a sign-in email to <b>{email}</b>. Open the link in it <b>on this device, in this browser</b>. It works once and expires after an hour.</p>
+            <p style={{ margin: 0 }}>We sent a sign-in email to <b>{email}</b>. Type the code from the email below — that works on any device. Or tap the link in the email if you opened it in this browser.</p>
             {SHOW_CODE && <>
             <label htmlFor="code">Code from the email</label>
-            <input id="code" inputMode="numeric" autoComplete="one-time-code" value={code} onChange={(e) => setCode(e.target.value)} placeholder="6-digit code" />
+            <input id="code" inputMode="numeric" autoComplete="one-time-code" value={code} onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))} placeholder="Code from the email" maxLength={10} />
             <button className="btn primary" disabled={busy || code.trim().length < 6}>{busy ? "Checking…" : "Sign in"}</button></>}
             <button type="button" className="link" onClick={() => { setSent(false); setCode(""); }}>Use a different email</button>
           </form>

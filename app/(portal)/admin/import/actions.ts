@@ -9,35 +9,62 @@ import { checkRows, type Checked, type Kind } from "@/lib/imports";
 
 export type Preview = { kind: Kind; file: string; batch: string; rows: Checked[]; error?: string } | null;
 
+const msg = (e: unknown) => (e instanceof Error ? e.message : String(e));
+const isFile = (v: unknown): v is File => !!v && typeof v === "object" && typeof (v as File).arrayBuffer === "function";
+
 export async function previewImport(_prev: Preview, fd: FormData): Promise<Preview> {
   await requireStaff();
   const kind = (fd.get("kind") === "cash" ? "cash" : "payments") as Kind;
   const file = fd.get("file");
-  if (!(file instanceof File) || file.size === 0) return { kind, file: "", batch: "", rows: [], error: "Choose a file first." };
-  if (file.size > 5_000_000) return { kind, file: file.name, batch: "", rows: [], error: "That file is larger than 5 MB." };
-  if (!/\.(xlsx|csv)$/i.test(file.name)) return { kind, file: file.name, batch: "", rows: [], error: "Use the Excel template (.xlsx) or a .csv file." };
-  let table: Record<string, string>[];
-  try { table = await readTable(file); } catch { return { kind, file: file.name, batch: "", rows: [], error: "The file couldn't be read. Save it again from Excel as .xlsx and retry." }; }
-  if (table.length === 0) return { kind, file: file.name, batch: "", rows: [], error: "No rows found. Keep the header row from the template (it starts with “date”)." };
-  if (table.length > 2000) return { kind, file: file.name, batch: "", rows: [], error: "Split the file: at most 2,000 rows per import." };
-  const rows = await checkRows(await db(), kind, table);
-  return { kind, file: file.name, batch: randomUUID(), rows };
+  if (!isFile(file) || file.size === 0) return { kind, file: "", batch: "", rows: [], error: "Choose a file first." };
+  const name = file.name || "upload";
+  if (file.size > 5_000_000) return { kind, file: name, batch: "", rows: [], error: "That file is larger than 5 MB." };
+  // Some phone file pickers drop the extension; fall back to the file type.
+  const isCsv = /\.csv$/i.test(name) || /csv/i.test(file.type);
+  const isXlsx = /\.xlsx$/i.test(name) || /spreadsheetml|excel/i.test(file.type);
+  if (!isCsv && !isXlsx) return { kind, file: name, batch: "", rows: [], error: `“${name}” isn’t an Excel (.xlsx) or .csv file. Use the template from step 1.` };
+  try {
+    let table: Record<string, string>[];
+    try {
+      const named = /\.(xlsx|csv)$/i.test(name) ? file : new File([await file.arrayBuffer()], name + (isCsv ? ".csv" : ".xlsx"), { type: file.type });
+      table = await readTable(named);
+    } catch (e) {
+      return { kind, file: name, batch: "", rows: [], error: `The file couldn't be read (${msg(e)}). Open it in Excel, save it as .xlsx, and try again.` };
+    }
+    if (table.length === 0) return { kind, file: name, batch: "", rows: [], error: "No rows found. Keep the header row from the template (it starts with “date”)." };
+    if (table.length > 2000) return { kind, file: name, batch: "", rows: [], error: "Split the file: at most 2,000 rows per import." };
+    const rows = await checkRows(await db(), kind, table);
+    return { kind, file: name, batch: randomUUID(), rows };
+  } catch (e) {
+    return { kind, file: name, batch: "", rows: [], error: `Checking the file failed: ${msg(e)}. Please send this message to the administrator.` };
+  }
 }
 
 export async function commitImport(fd: FormData) {
   await requireStaff();
   const kind = fd.get("kind") === "cash" ? "cash" : "payments";
   const batch = String(fd.get("batch")); const file = String(fd.get("file") ?? "");
-  const rows = JSON.parse(String(fd.get("rows") ?? "[]")) as Record<string, string>[];
   const back = `/admin/import${kind === "cash" ? "?kind=cash&" : "?"}`;
-  if (!rows.length) redirect(back + "e=" + encodeURIComponent("Nothing to import."));
-  const sb = await db();
-  const { error } = kind === "cash"
-    ? await sb.rpc("import_cash", { p_batch: batch, p_file: file, p_rows: rows })
-    : await sb.rpc("import_payments", { p_batch: batch, p_file: file, p_rows: rows });
-  if (error) redirect(back + "e=" + encodeURIComponent(`Nothing was imported. ${error.message}`));
+  let outcome: string;
+  let count = 0;
+  try {
+    const rows = JSON.parse(String(fd.get("rows") ?? "[]")) as Record<string, string>[];
+    count = rows.length;
+    if (!rows.length) { outcome = "e=" + encodeURIComponent("Nothing to import."); }
+    else {
+      const sb = await db();
+      const { error } = kind === "cash"
+        ? await sb.rpc("import_cash", { p_batch: batch, p_file: file, p_rows: rows })
+        : await sb.rpc("import_payments", { p_batch: batch, p_file: file, p_rows: rows });
+      outcome = error
+        ? "e=" + encodeURIComponent(`Nothing was imported. ${error.message}`)
+        : "ok=" + encodeURIComponent(`Imported ${count} ${kind === "cash" ? "cashbook entries" : "payments"} from ${file}.${kind === "payments" ? " Receipts were issued for each." : ""}`);
+    }
+  } catch (e) {
+    outcome = "e=" + encodeURIComponent(`Nothing was imported. ${msg(e)}`);
+  }
   revalidatePath("/", "layout");
-  redirect(back + "ok=" + encodeURIComponent(`Imported ${rows.length} ${kind === "cash" ? "cashbook entries" : "payments"} from ${file}.${kind === "payments" ? " Receipts were issued for each." : ""}`));
+  redirect(back + outcome);
 }
 
 export async function undoImport(fd: FormData) {

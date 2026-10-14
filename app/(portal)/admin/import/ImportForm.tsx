@@ -13,7 +13,7 @@ export default function ImportForm({ kind }: { kind: "payments" | "cash" }) {
   return (<>
     <form action={action} className="toolbar">
       <input type="hidden" name="kind" value={kind} />
-      <div className="field"><label htmlFor="file">Filled-in template (.xlsx or .csv)</label><input id="file" name="file" type="file" accept=".xlsx,.csv" required /></div>
+      <div className="field"><label htmlFor="file">Filled-in template (.xlsx or .csv)</label><input id="file" name="file" type="file" accept=".xlsx,.csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv" required /></div>
       <button className="btn primary" disabled={busy}>{busy ? "Checking…" : "Check file"}</button>
     </form>
     {p?.error && <p className="err" role="alert">{p.error}</p>}

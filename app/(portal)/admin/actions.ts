@@ -129,3 +129,23 @@ export async function addResolution(fd: FormData) {
   if (error) back("/admin/rates", error.message);
   revalidatePath("/", "layout"); back("/admin/rates", null, "Resolution recorded.");
 }
+
+/* ---------- Fixing venture shares ---------- */
+export async function fixShares(fd: FormData) {
+  await requireAdmin(); const sb = await db();
+  const v = s(fd, "venture") ?? "", d = s(fd, "date") ?? "";
+  const page = `/admin/ventures/${encodeURIComponent(v)}/shares?date=${d}`;
+  if (fd.get("confirm") !== "yes") back(page, "Tick the box to confirm members agreed this start date.");
+  const { data, error } = await sb.rpc("fix_venture_shares", { p_venture: v, p_date: d });
+  if (error) back(page, error.message);
+  revalidatePath("/", "layout");
+  back("/admin/ventures", null, `Shares fixed on ${d} for ${data} members. Members now see their share on their dashboard.`);
+}
+
+export async function unfixShares(fd: FormData) {
+  await requireAdmin(); const sb = await db();
+  const { error } = await sb.rpc("unfix_venture_shares", { p_venture: s(fd, "venture"), p_reason: s(fd, "reason") });
+  if (error) back("/admin/ventures", error.message);
+  revalidatePath("/", "layout");
+  back("/admin/ventures", null, "Shares un-fixed. The venture is back in Funding.");
+}

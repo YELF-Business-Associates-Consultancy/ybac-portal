@@ -14,7 +14,8 @@ Run in this order, each as one query:
    loads the reconciled records from Aug 2023 to 6 Oct 2026.
 3. `supabase/migrations/004_app_functions.sql` adds the sign-up gate, receipt numbers and the payment, withdrawal and bank-interest functions.
 4. `supabase/migrations/005_imports.sql` adds Excel imports (all-or-nothing) and undoing an import.
-5. Sign in to the app once, then run `supabase/migrations/003_first_admin.sql` to make yourself admin.
+5. `supabase/migrations/006_fix_shares.sql` adds fixing (and undoing) a venture's member shares from the Ventures page.
+6. Sign in to the app once, then run `supabase/migrations/003_first_admin.sql` to make yourself admin.
 
 Supabase → Authentication → URL Configuration: set the Site URL to the Vercel address and add `<site>/auth/callback` as a redirect URL.
 

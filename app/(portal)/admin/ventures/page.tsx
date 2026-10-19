@@ -1,8 +1,9 @@
+import Link from "next/link";
 import { requireStaff } from "@/lib/session";
 import { db } from "@/lib/supabase/server";
 import { fmt, ghs, dstr, today, pct } from "@/lib/format";
 import Flash from "@/components/Flash";
-import { createVenture, addPayable, setOpenItemStatus } from "../actions";
+import { createVenture, addPayable, setOpenItemStatus, unfixShares } from "../actions";
 
 type SP = Promise<{ e?: string; ok?: string }>;
 export default async function Page({ searchParams }: { searchParams: SP }) {
@@ -33,6 +34,9 @@ export default async function Page({ searchParams }: { searchParams: SP }) {
         <header><h2>{v.name}</h2><span className={`chip ${statusChip(v.status)}`}>{v.status}{v.shares_fixed_on ? ` · shares fixed ${dstr(v.shares_fixed_on)} (${nShares} members)` : " · shares not fixed yet"}</span></header>
         <div className="body">
           {v.description && <p className="muted" style={{ margin: 0 }}>{v.description}</p>}
+          {v.status === "Funding" && <div className="toolbar"><Link className="btn" href={`/admin/ventures/${v.id}/shares`}>{admin ? "Preview and fix shares…" : "Preview shares"}</Link><span className="muted">Shares are worked out from members’ balances on the start date you choose.</span></div>}
+          {admin && v.status === "Active" && vd.length === 0 && <form action={unfixShares} className="inline"><input type="hidden" name="venture" value={v.id} />
+            <span className="muted">Fixed by mistake?</span><input name="reason" placeholder="Reason" aria-label="Reason for undoing" required style={{ width: 160 }} /><button className="btn small">Undo fixed shares</button></form>}
           <div className="tbl"><table><tbody>
             <tr><td>Money in — paid from the bank</td><td className="r">{fmt(b?.money_in_paid_cash)}</td></tr>
             {N(b?.money_in_noncash) > 0 && <tr><td>Money in — settled outside the bank</td><td className="r">{fmt(b?.money_in_noncash)}</td></tr>}
